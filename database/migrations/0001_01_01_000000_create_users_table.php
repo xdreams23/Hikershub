@@ -7,6 +7,12 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
+     * MATIKAN TRANSAKSI OTOMATIS
+     * Agar koneksi tidak error saat membuat tabel
+     */
+    public $withinTransaction = false;
+
+    /**
      * Run the migrations.
      */
     public function up(): void
