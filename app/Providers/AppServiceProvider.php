@@ -20,8 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // <--- 2. TAMBAHKAN INI
-        // Ini memaksa Laravel menggunakan style Bootstrap 5 untuk pagination (bukan Tailwind)
+       if($this->app->environment('production')) {
+        \Illuminate\Support\Facades\URL::forceScheme('https');
+    }
         Paginator::useBootstrapFive(); 
     }
 }
