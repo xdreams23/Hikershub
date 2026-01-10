@@ -28,10 +28,10 @@ class DashboardController extends Controller
                                 ->take(10)
                                 ->get();
 
-        // Monthly Revenue Chart Data
-        $monthlyRevenue = Payment::where('status', 'success')
-                                ->whereYear('created_at', Carbon::now()->year)
-                                ->selectRaw('MONTH(created_at) as month, SUM(amount) as total')
+        $monthlyRevenue = \App\Models\Payment::where('status', 'success')
+                                 ->whereYear('created_at', \Carbon\Carbon::now()->year)
+                                // PERUBAHAN DISINI: Ganti MONTH() jadi EXTRACT(MONTH FROM ...)
+                                ->selectRaw('EXTRACT(MONTH FROM created_at) as month, SUM(amount) as total') 
                                 ->groupBy('month')
                                 ->pluck('total', 'month')
                                 ->toArray();
