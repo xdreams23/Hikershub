@@ -1,6 +1,8 @@
 <?php
 
 use Carbon\Carbon;
+// 1. IMPORT CLOUDINARY (WAJIB ADA)
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 if (!function_exists('formatRupiah')) {
     /**
@@ -47,14 +49,18 @@ if (!function_exists('diffForHumans')) {
 
 if (!function_exists('uploadImage')) {
     /**
-     * Upload image and return path
+     * Upload image to Cloudinary and return URL
      */
     function uploadImage($file, $folder = 'images')
     {
         if ($file) {
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs($folder, $filename, 'public');
-            return $path;
+            // 2. LOGIKA BARU: UPLOAD KE CLOUDINARY
+            // Ini akan mengirim file ke server Cloudinary dan mengembalikan Link HTTPS
+            $result = Cloudinary::upload($file->getRealPath(), [
+                'folder' => $folder
+            ]);
+            
+            return $result->getSecurePath();
         }
         return null;
     }
@@ -63,6 +69,8 @@ if (!function_exists('uploadImage')) {
 if (!function_exists('deleteImage')) {
     /**
      * Delete image from storage
+     * (Note: Untuk Cloudinary, fitur delete butuh Public ID. 
+     * Fungsi ini sementara dibiarkan untuk file lokal lama)
      */
     function deleteImage($path)
     {
