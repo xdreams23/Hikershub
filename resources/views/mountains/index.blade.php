@@ -307,7 +307,7 @@
                     </span>
                     
                     @if($mountain->image)
-                        <img src="{{ asset('storage/'.$mountain->image) }}" alt="{{ $mountain->name }}">
+                       <img src="{{ Str::startsWith($mountain->image, 'http') ? $mountain->image : asset('storage/' . $mountain->image) }}">
                     @else
                         <div class="bg-secondary d-flex align-items-center justify-content-center h-100 w-100">
                             <i class="fas fa-mountain fa-4x text-white opacity-25"></i>
