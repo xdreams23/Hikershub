@@ -52,18 +52,15 @@ if (!function_exists('uploadImage')) {
      * Upload image to Cloudinary and return URL
      */
     function uploadImage($file, $folder = 'images')
-    {
-        if ($file) {
-            // 2. LOGIKA BARU: UPLOAD KE CLOUDINARY
-            // Ini akan mengirim file ke server Cloudinary dan mengembalikan Link HTTPS
-            $result = Cloudinary::upload($file->getRealPath(), [
-                'folder' => $folder
-            ]);
-            
-            return $result->getSecurePath();
-        }
-        return null;
+{
+    if ($file) {
+        // --- KEMBALI KE VERSI LOCAL ---
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs($folder, $filename, 'public');
+        return $path;
     }
+    return null;
+}
 }
 
 if (!function_exists('deleteImage')) {

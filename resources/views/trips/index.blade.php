@@ -3,6 +3,8 @@
 @section('title', 'Browse Trips')
 
 @section('styles')
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
 <style>
     /* --- 1. PALET WARNA --- */
     :root {
@@ -14,12 +16,25 @@
         --bg-off-white: #f8f9fa;
     }
 
-    /* --- 2. NAVBAR SCROLL LOGIC --- */
+    /* --- 2. CSS KEYFRAMES (Untuk Hero Section) --- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-animate-up { opacity: 0; animation: fadeInUp 1s ease-out forwards; }
+    .hero-animate-down { opacity: 0; animation: fadeInDown 1s ease-out forwards; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-400 { animation-delay: 0.4s; }
+
+    /* --- 3. NAVBAR SCROLL LOGIC --- */
     .navbar {
         position: fixed !important;
-        top: 0;
-        width: 100%;
-        z-index: 9999;
+        top: 0; width: 100%; z-index: 9999;
         background-color: transparent !important;
         box-shadow: none !important;
         transition: all 0.4s ease-in-out;
@@ -42,9 +57,9 @@
     .navbar .btn-outline-primary { color: white !important; border-color: white !important; }
     .navbar .btn-outline-primary:hover { background-color: var(--accent-color) !important; border-color: var(--accent-color) !important; }
 
-    /* --- 3. PAGE HERO HEADER --- */
+    /* --- 4. PAGE HERO HEADER --- */
     .page-header {
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('{{ asset("images/Elvin.jpg") }}'); /* Ganti dengan gambar header umum */
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('{{ asset("images/Elvin.jpg") }}'); 
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -52,52 +67,47 @@
         color: white;
         text-align: center;
         margin-bottom: 50px;
+        position: relative;
+        overflow: hidden;
     }
 
-    /* --- 4. FILTER SIDEBAR --- */
+    /* --- 5. FILTER SIDEBAR --- */
     .filter-card {
         border: none;
         border-radius: 20px;
         box-shadow: 0 5px 20px rgba(0,0,0,0.05);
         background: white;
         overflow: hidden;
+        transition: transform 0.3s ease;
     }
-
+    
     .filter-header {
         background: var(--primary-dark);
         color: white;
         padding: 20px 25px;
         font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        display: flex; align-items: center; justify-content: space-between;
     }
 
-    .filter-body {
-        padding: 25px;
-    }
+    .filter-body { padding: 25px; }
 
     .form-label {
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: var(--text-dark);
-        margin-bottom: 8px;
+        font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 8px;
     }
 
     .form-control, .form-select {
-        border-radius: 10px;
-        border: 1px solid #eee;
-        padding: 10px 15px;
-        font-size: 0.95rem;
-        background-color: var(--bg-off-white);
+        border-radius: 10px; border: 1px solid #eee; padding: 10px 15px;
+        font-size: 0.95rem; background-color: var(--bg-off-white);
+        transition: all 0.2s;
     }
 
     .form-control:focus, .form-select:focus {
         border-color: var(--primary-light);
         box-shadow: 0 0 0 3px rgba(151, 188, 98, 0.2);
+        background-color: white;
     }
 
-    /* --- 5. TRIP CARD DESIGN (Sama seperti Home) --- */
+    /* --- 6. TRIP CARD DESIGN --- */
     .trip-card {
         border: 1px solid rgba(0,0,0,0.04);
         border-radius: 20px;
@@ -107,121 +117,71 @@
         overflow: hidden;
         height: 100%;
         position: relative;
-        display: flex;
-        flex-direction: column;
+        display: flex; flex-direction: column;
     }
 
     .trip-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
     }
     
-    .card-img-wrapper {
-        height: 220px;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .card-img-wrapper img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.6s ease;
-    }
-
+    .card-img-wrapper { height: 220px; position: relative; overflow: hidden; }
+    .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
     .trip-card:hover .card-img-wrapper img { transform: scale(1.1); }
 
     /* Badges */
     .badge-difficulty {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(4px);
-        color: var(--primary-dark);
-        font-weight: 700;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        padding: 6px 14px;
-        border-radius: 30px;
-        z-index: 2;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        position: absolute; top: 15px; left: 15px;
+        background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px);
+        color: var(--primary-dark); font-weight: 700; font-size: 0.7rem;
+        text-transform: uppercase; padding: 6px 14px; border-radius: 30px;
+        z-index: 2; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     .card-body-custom {
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-        justify-content: space-between;
+        padding: 24px; display: flex; flex-direction: column;
+        flex-grow: 1; justify-content: space-between;
     }
 
     .card-location {
-        color: var(--accent-color);
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 5px;
-        display: block;
+        color: var(--accent-color); font-size: 0.75rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: block;
     }
 
     .card-title {
-        font-size: 1.2rem;
-        font-weight: 800;
-        color: var(--text-dark);
-        margin-bottom: 10px;
-        line-height: 1.4;
+        font-size: 1.2rem; font-weight: 800; color: var(--text-dark);
+        margin-bottom: 10px; line-height: 1.4; transition: color 0.2s;
     }
+    .card-title:hover { color: var(--primary-dark); }
 
     .meta-info {
-        display: flex;
-        gap: 15px;
-        font-size: 0.85rem;
-        color: var(--text-grey);
-        margin-bottom: 15px;
+        display: flex; gap: 15px; font-size: 0.85rem; color: var(--text-grey); margin-bottom: 15px;
     }
-
     .meta-info i { color: var(--primary-light); margin-right: 5px; }
 
     .card-footer-custom {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: auto;
-        padding-top: 15px;
-        border-top: 1px solid #f0f0f0;
+        display: flex; justify-content: space-between; align-items: center;
+        margin-top: auto; padding-top: 15px; border-top: 1px solid #f0f0f0;
     }
 
     .price-value { font-size: 1.1rem; font-weight: 800; color: var(--primary-dark); }
     .price-label { font-size: 0.7rem; color: var(--text-grey); display: block; }
 
     .btn-card-action {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background: var(--bg-off-white);
-        color: var(--primary-dark);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        width: 40px; height: 40px; border-radius: 12px;
+        background: var(--bg-off-white); color: var(--primary-dark);
+        display: flex; align-items: center; justify-content: center;
         transition: all 0.3s ease;
     }
-
     .trip-card:hover .btn-card-action {
-        background: var(--accent-color);
-        color: white;
+        background: var(--accent-color); color: white; transform: rotate(-45deg);
     }
 
     /* Buttons */
     .btn-accent {
-        background-color: var(--accent-color);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 10px;
-        font-weight: 600;
-        transition: all 0.3s;
+        background-color: var(--accent-color); color: white;
+        border: none; border-radius: 10px; padding: 10px;
+        font-weight: 600; transition: all 0.3s;
     }
     .btn-accent:hover { background-color: #c45d1e; color: white; transform: translateY(-2px); }
 
@@ -232,8 +192,12 @@
 
 <div class="page-header">
     <div class="container">
-        <h1 class="display-4 fw-bold mb-2">Explore Open Trips</h1>
-        <p class="lead opacity-90">Find your next mountain adventure and create unforgettable memories.</p>
+        <h1 class="hero-animate-down display-4 fw-bold mb-2" style="text-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+            Explore Open Trips
+        </h1>
+        <p class="hero-animate-up delay-200 lead opacity-90" style="text-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+            Find your next mountain adventure and create unforgettable memories.
+        </p>
     </div>
 </div>
 
@@ -241,7 +205,9 @@
     <div class="row">
         
         <div class="col-lg-3 mb-5">
-            <div class="filter-card sticky-top" style="top: 100px; z-index: 1;">
+            <div class="filter-card sticky-top" style="top: 100px; z-index: 1;" 
+                 data-aos="fade-right" data-aos-duration="800">
+                 
                 <div class="filter-header">
                     <span><i class="fas fa-filter me-2"></i> Filters</span>
                 </div>
@@ -302,7 +268,7 @@
                             </select>
                         </div>
 
-                        <button type="submit" class="btn btn-accent w-100 mb-2">
+                        <button type="submit" class="btn btn-accent w-100 mb-2 shadow-sm">
                             Apply Filters
                         </button>
                         
@@ -316,7 +282,7 @@
 
         <div class="col-lg-9">
             
-            <div class="d-flex justify-content-between align-items-center mb-4 ps-2">
+            <div class="d-flex justify-content-between align-items-center mb-4 ps-2" data-aos="fade-down" data-aos-delay="100">
                 <h5 class="fw-bold text-dark mb-0">
                     Showing <span style="color: var(--accent-color);">{{ $trips->total() }}</span> Adventures
                 </h5>
@@ -325,7 +291,11 @@
             @if($trips->count() > 0)
             <div class="row g-4">
                 @foreach($trips as $trip)
-                <div class="col-md-6 col-xl-4">
+                <div class="col-md-6 col-xl-4" 
+                     data-aos="fade-up" 
+                     data-aos-delay="{{ $loop->iteration * 100 }}" 
+                     data-aos-duration="800">
+                     
                     <div class="trip-card">
                         <div class="card-img-wrapper">
                             <span class="badge-difficulty">
@@ -373,16 +343,16 @@
                             </div>
                         </div>
                     </div>
-                    </div>
+                </div>
                 @endforeach
             </div>
 
-            <div class="d-flex justify-content-center mt-5">
+            <div class="d-flex justify-content-center mt-5" data-aos="fade-up" data-aos-delay="200">
                 {{ $trips->links() }}
             </div>
             
             @else
-            <div class="text-center py-5 bg-light rounded-4 border border-dashed">
+            <div class="text-center py-5 bg-light rounded-4 border border-dashed" data-aos="zoom-in">
                 <div class="mb-3 text-muted opacity-50">
                     <i class="fas fa-search fa-3x"></i>
                 </div>
@@ -398,7 +368,15 @@
 @endsection
 
 @push('scripts')
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
 <script>
+    // Init AOS
+    AOS.init({
+        once: true,
+        offset: 50, // Muncul sedikit lebih cepat
+    });
+
     // Navbar Scroll Logic
     document.addEventListener("DOMContentLoaded", function(){
         const navbar = document.querySelector('.navbar'); 

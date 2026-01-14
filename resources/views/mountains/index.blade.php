@@ -3,6 +3,8 @@
 @section('title', 'Browse Mountains')
 
 @section('styles')
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
 <style>
     /* --- 1. COLOR PALETTE --- */
     :root {
@@ -14,12 +16,27 @@
         --bg-off-white: #f8f9fa;
     }
 
-    /* --- 2. NAVBAR SCROLL LOGIC --- */
+    /* --- 2. CSS ANIMATIONS (HERO SECTION) --- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-animate-up { opacity: 0; animation: fadeInUp 1s ease-out forwards; }
+    .hero-animate-down { opacity: 0; animation: fadeInDown 1s ease-out forwards; }
+    
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-400 { animation-delay: 0.4s; }
+    .delay-600 { animation-delay: 0.6s; }
+
+    /* --- 3. NAVBAR SCROLL LOGIC --- */
     .navbar {
         position: fixed !important;
-        top: 0;
-        width: 100%;
-        z-index: 9999;
+        top: 0; width: 100%; z-index: 9999;
         background-color: transparent !important;
         box-shadow: none !important;
         transition: all 0.4s ease-in-out;
@@ -42,20 +59,20 @@
     .navbar .btn-outline-primary { color: white !important; border-color: white !important; }
     .navbar .btn-outline-primary:hover { background-color: var(--accent-color) !important; border-color: var(--accent-color) !important; }
 
-    /* --- 3. HERO HEADER --- */
+    /* --- 4. HERO HEADER --- */
     .page-header {
-        /*  */
         background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('{{ asset("images/Elvin.jpg") }}');
         background-size: cover;
-        background-position: center 30%; /* Shifted up slightly */
+        background-position: center 30%;
         background-attachment: fixed;
         padding: 180px 0 100px 0;
         color: white;
         text-align: center;
         margin-bottom: 60px;
+        overflow: hidden; /* Biar animasi tidak bikin scrollbar samping */
     }
 
-    /* --- 4. SEARCH BAR COMPONENT --- */
+    /* --- 5. SEARCH BAR COMPONENT --- */
     .search-container {
         background: white;
         padding: 15px;
@@ -67,184 +84,106 @@
         margin: -40px auto 50px auto; /* Overlap header */
         position: relative;
         z-index: 10;
+        transition: transform 0.3s ease;
+    }
+    
+    .search-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
     }
 
     .search-input {
-        border: none;
-        flex-grow: 1;
-        padding: 10px 20px;
-        font-size: 1rem;
-        outline: none;
+        border: none; flex-grow: 1; padding: 10px 20px;
+        font-size: 1rem; outline: none;
     }
 
-    .search-divider {
-        width: 1px;
-        height: 30px;
-        background: #eee;
-        margin: 0 15px;
-    }
+    .search-divider { width: 1px; height: 30px; background: #eee; margin: 0 15px; }
 
     .search-select {
-        border: none;
-        outline: none;
-        background: transparent;
-        color: var(--text-dark);
-        font-weight: 600;
-        cursor: pointer;
-        padding: 10px;
+        border: none; outline: none; background: transparent;
+        color: var(--text-dark); font-weight: 600; cursor: pointer; padding: 10px;
     }
 
     .btn-search-circle {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: var(--accent-color);
-        color: white;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s;
-        flex-shrink: 0;
+        width: 50px; height: 50px; border-radius: 50%;
+        background: var(--accent-color); color: white; border: none;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.3s; flex-shrink: 0;
     }
-    .btn-search-circle:hover {
-        background: #c45d1e;
-        transform: scale(1.05);
-    }
+    .btn-search-circle:hover { background: #c45d1e; transform: scale(1.05); }
 
     /* Mobile Responsive Search */
     @media (max-width: 768px) {
         .search-container {
-            flex-direction: column;
-            border-radius: 20px;
-            margin-top: 20px;
-            gap: 15px;
-            padding: 20px;
+            flex-direction: column; border-radius: 20px;
+            margin-top: 20px; gap: 15px; padding: 20px;
         }
         .search-divider { display: none; }
         .search-input, .search-select { width: 100%; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .btn-search-circle { width: 100%; border-radius: 10px; }
     }
 
-    /* --- 5. MOUNTAIN CARD DESIGN --- */
+    /* --- 6. MOUNTAIN CARD DESIGN --- */
     .mountain-card {
         border: 1px solid rgba(0,0,0,0.04);
-        border-radius: 20px;
-        background: white;
+        border-radius: 20px; background: white;
         box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        overflow: hidden;
-        height: 100%;
-        position: relative;
-        display: flex;
-        flex-direction: column;
+        overflow: hidden; height: 100%;
+        position: relative; display: flex; flex-direction: column;
     }
 
-    .mountain-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-    }
+    .mountain-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
     
-    .card-img-wrapper {
-        height: 250px; /* Taller image for mountains */
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .card-img-wrapper img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.6s ease;
-    }
-
+    .card-img-wrapper { height: 250px; position: relative; overflow: hidden; }
+    .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
     .mountain-card:hover .card-img-wrapper img { transform: scale(1.1); }
 
     /* Badge Difficulty */
     .badge-difficulty {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(4px);
-        color: var(--primary-dark);
-        font-weight: 700;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        padding: 6px 14px;
-        border-radius: 30px;
-        z-index: 2;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        position: absolute; top: 15px; right: 15px;
+        background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px);
+        color: var(--primary-dark); font-weight: 700; font-size: 0.7rem;
+        text-transform: uppercase; padding: 6px 14px; border-radius: 30px;
+        z-index: 2; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     .card-body-custom {
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-        justify-content: space-between;
+        padding: 24px; display: flex; flex-direction: column;
+        flex-grow: 1; justify-content: space-between;
     }
 
     .mtn-location {
-        color: var(--text-grey);
-        font-size: 0.85rem;
-        margin-bottom: 5px;
-        display: block;
+        color: var(--text-grey); font-size: 0.85rem; margin-bottom: 5px; display: block;
     }
 
     .mtn-title {
-        font-size: 1.4rem;
-        font-weight: 800;
-        color: var(--text-dark);
-        margin-bottom: 15px;
+        font-size: 1.4rem; font-weight: 800; color: var(--text-dark);
+        margin-bottom: 15px; transition: color 0.3s;
     }
+    .mountain-card:hover .mtn-title { color: var(--primary-dark); }
 
     .mtn-stats {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #f0f0f0;
+        display: flex; gap: 20px; margin-bottom: 20px;
+        padding-bottom: 20px; border-bottom: 1px solid #f0f0f0;
     }
 
-    .stat-item {
-        display: flex;
-        flex-direction: column;
-        font-size: 0.8rem;
-        color: var(--text-grey);
-    }
-    
-    .stat-item strong {
-        font-size: 1rem;
-        color: var(--primary-dark);
-        font-weight: 700;
-    }
+    .stat-item { display: flex; flex-direction: column; font-size: 0.8rem; color: var(--text-grey); }
+    .stat-item strong { font-size: 1rem; color: var(--primary-dark); font-weight: 700; }
 
     .card-footer-custom {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: auto;
+        display: flex; justify-content: space-between; align-items: center; margin-top: auto;
     }
 
     .trips-count {
-        font-size: 0.85rem;
-        color: var(--accent-color);
-        font-weight: 600;
-        background: rgba(229, 115, 45, 0.1);
-        padding: 5px 12px;
-        border-radius: 8px;
+        font-size: 0.85rem; color: var(--accent-color); font-weight: 600;
+        background: rgba(229, 115, 45, 0.1); padding: 5px 12px; border-radius: 8px;
     }
 
     .btn-view-details {
-        color: var(--primary-dark);
-        font-weight: 700;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        transition: color 0.3s;
+        color: var(--primary-dark); font-weight: 700; text-decoration: none;
+        display: flex; align-items: center; transition: color 0.3s;
     }
-    
     .btn-view-details:hover { color: var(--accent-color); }
     .btn-view-details i { margin-left: 5px; transition: transform 0.3s; }
     .btn-view-details:hover i { transform: translateX(5px); }
@@ -256,37 +195,44 @@
 
 <div class="page-header">
     <div class="container">
-        <h1 class="display-3 fw-bold mb-3">Explore Majestic Peaks</h1>
-        <p class="lead opacity-90">Discover the breathtaking mountains of Indonesia waiting for your footsteps.</p>
+        <h1 class="hero-animate-down display-3 fw-bold mb-3" style="text-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+            Explore Majestic Peaks
+        </h1>
+        <p class="hero-animate-up delay-200 lead opacity-90" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+            Discover the breathtaking mountains of Indonesia waiting for your footsteps.
+        </p>
     </div>
 </div>
 
 <div class="container pb-5">
     
-    <form method="GET" action="{{ route('mountains.index') }}">
-        <div class="search-container">
-            <i class="fas fa-search text-muted ms-2"></i>
-            <input type="text" name="search" class="search-input" 
-                   placeholder="Find mountain by name or location..." 
-                   value="{{ request('search') }}">
-            
-            <div class="search-divider"></div>
-            
-            <select name="difficulty" class="search-select">
-                <option value="">All Levels</option>
-                <option value="easy" {{ request('difficulty') == 'easy' ? 'selected' : '' }}>Easy</option>
-                <option value="medium" {{ request('difficulty') == 'medium' ? 'selected' : '' }}>Medium</option>
-                <option value="hard" {{ request('difficulty') == 'hard' ? 'selected' : '' }}>Hard</option>
-                <option value="extreme" {{ request('difficulty') == 'extreme' ? 'selected' : '' }}>Extreme</option>
-            </select>
+    <div class="hero-animate-up delay-400">
+        <form method="GET" action="{{ route('mountains.index') }}">
+            <div class="search-container">
+                <i class="fas fa-search text-muted ms-2"></i>
+                <input type="text" name="search" class="search-input" 
+                       placeholder="Find mountain by name or location..." 
+                       value="{{ request('search') }}">
+                
+                <div class="search-divider"></div>
+                
+                <select name="difficulty" class="search-select">
+                    <option value="">All Levels</option>
+                    <option value="easy" {{ request('difficulty') == 'easy' ? 'selected' : '' }}>Easy</option>
+                    <option value="medium" {{ request('difficulty') == 'medium' ? 'selected' : '' }}>Medium</option>
+                    <option value="hard" {{ request('difficulty') == 'hard' ? 'selected' : '' }}>Hard</option>
+                    <option value="extreme" {{ request('difficulty') == 'extreme' ? 'selected' : '' }}>Extreme</option>
+                </select>
 
-            <button type="submit" class="btn-search-circle ms-3">
-                <i class="fas fa-arrow-right"></i>
-            </button>
-        </div>
-    </form>
+                <button type="submit" class="btn-search-circle ms-3">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </form>
+    </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+    <div class="d-flex justify-content-between align-items-center mb-4 px-2" 
+         data-aos="fade-in" data-aos-delay="600">
         <h5 class="fw-bold mb-0">Found <span style="color: var(--accent-color)">{{ $mountains->total() }}</span> Mountains</h5>
         
         @if(request('search') || request('difficulty'))
@@ -299,7 +245,11 @@
     @if($mountains->count() > 0)
     <div class="row g-4">
         @foreach($mountains as $mountain)
-        <div class="col-md-6 col-lg-4">
+        <div class="col-md-6 col-lg-4" 
+             data-aos="fade-up" 
+             data-aos-delay="{{ $loop->iteration * 100 }}" 
+             data-aos-duration="800">
+             
             <div class="mountain-card">
                 <div class="card-img-wrapper">
                     <span class="badge-difficulty">
@@ -307,7 +257,8 @@
                     </span>
                     
                     @if($mountain->image)
-                       <img src="{{ Str::startsWith($mountain->image, 'http') ? $mountain->image : asset('storage/' . $mountain->image) }}">
+                       <img src="{{ Str::startsWith($mountain->image, 'http') ? $mountain->image : asset('storage/' . $mountain->image) }}"
+                            alt="{{ $mountain->name }}">
                     @else
                         <div class="bg-secondary d-flex align-items-center justify-content-center h-100 w-100">
                             <i class="fas fa-mountain fa-4x text-white opacity-25"></i>
@@ -318,7 +269,9 @@
                 <div class="card-body-custom">
                     <div>
                         <span class="mtn-location"><i class="fas fa-map-marker-alt me-1"></i> {{ $mountain->location }}</span>
-                        <h3 class="mtn-title">{{ $mountain->name }}</h3>
+                        <a href="{{ route('mountains.show', $mountain) }}" class="text-decoration-none">
+                            <h3 class="mtn-title">{{ $mountain->name }}</h3>
+                        </a>
                         
                         <div class="mtn-stats">
                             <div class="stat-item">
@@ -346,16 +299,16 @@
                     </div>
                 </div>
             </div>
-            </div>
+        </div>
         @endforeach
     </div>
 
-    <div class="d-flex justify-content-center mt-5">
+    <div class="d-flex justify-content-center mt-5" data-aos="fade-up" data-aos-delay="200">
         {{ $mountains->links() }}
     </div>
 
     @else
-    <div class="text-center py-5 bg-light rounded-4 border border-dashed mt-4">
+    <div class="text-center py-5 bg-light rounded-4 border border-dashed mt-4" data-aos="zoom-in">
         <div class="mb-3 text-muted opacity-50">
             <i class="fas fa-mountain fa-3x"></i>
         </div>
@@ -370,7 +323,15 @@
 @endsection
 
 @push('scripts')
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
 <script>
+    // Init AOS
+    AOS.init({
+        once: true,
+        offset: 80, 
+    });
+
     // Navbar Scroll Logic
     document.addEventListener("DOMContentLoaded", function(){
         const navbar = document.querySelector('.navbar'); 

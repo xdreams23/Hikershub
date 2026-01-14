@@ -9,84 +9,23 @@
 </a>
 @endsection
 
-@section('styles')
-<style>
-    /* Status Colors */
-    .status-card {
-        border-radius: 15px;
-        border: none;
-        position: relative;
-        overflow: hidden;
-    }
-    .status-pending { background: #fff3cd; color: #856404; border-left: 5px solid #ffc107; }
-    .status-confirmed { background: #d1ecf1; color: #0c5460; border-left: 5px solid #17a2b8; }
-    .status-paid { background: #d4edda; color: #155724; border-left: 5px solid #28a745; }
-    .status-cancelled { background: #f8d7da; color: #721c24; border-left: 5px solid #dc3545; }
-
-    /* Trip Card Mini */
-    .trip-mini-card {
-        display: flex;
-        gap: 20px;
-        align-items: center;
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 15px;
-        margin-bottom: 30px;
-    }
-    .trip-mini-img {
-        width: 100px;
-        height: 100px;
-        border-radius: 12px;
-        object-fit: cover;
-    }
-
-    /* Price Section */
-    .price-box {
-        background: white;
-        border: 1px solid #eee;
-        border-radius: 15px;
-        padding: 25px;
-    }
-    .total-price {
-        font-size: 1.8rem;
-        font-weight: 800;
-        color: var(--primary-dark);
-    }
-
-    /* Sidebar Widgets */
-    .action-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-        border: none;
-        margin-bottom: 20px;
-    }
-    .action-header {
-        padding: 15px 20px;
-        border-bottom: 1px solid #f0f0f0;
-        font-weight: 700;
-        color: var(--primary-dark);
-    }
-</style>
-@endsection
-
 @section('content')
 
 <div class="row g-4">
     
     <div class="col-lg-8">
         
-        <div class="card status-card mb-4 {{ 'status-'.$booking->status }}">
+        <div class="card mb-4 border-0 shadow-sm" style="border-radius: 15px; overflow: hidden; border-left: 5px solid {{ $booking->status == 'pending' ? '#ffc107' : ($booking->status == 'confirmed' ? '#17a2b8' : ($booking->status == 'paid' ? '#28a745' : '#dc3545')) }}; background-color: {{ $booking->status == 'pending' ? '#fff3cd' : ($booking->status == 'confirmed' ? '#d1ecf1' : ($booking->status == 'paid' ? '#d4edda' : '#f8d7da')) }}">
             <div class="card-body d-flex align-items-center">
                 <div class="me-3">
-                    @if($booking->status == 'pending') <i class="fas fa-clock fa-3x opacity-50"></i>
-                    @elseif($booking->status == 'confirmed') <i class="fas fa-spinner fa-3x opacity-50"></i>
-                    @elseif($booking->status == 'paid') <i class="fas fa-check-circle fa-3x opacity-50"></i>
-                    @else <i class="fas fa-times-circle fa-3x opacity-50"></i>
+                    @if($booking->status == 'pending') <i class="fas fa-clock fa-3x opacity-50" style="color: #856404"></i>
+                    @elseif($booking->status == 'confirmed') <i class="fas fa-spinner fa-3x opacity-50" style="color: #0c5460"></i>
+                    @elseif($booking->status == 'paid') <i class="fas fa-check-circle fa-3x opacity-50" style="color: #155724"></i>
+                    @else <i class="fas fa-times-circle fa-3x opacity-50" style="color: #721c24"></i>
                     @endif
                 </div>
                 <div>
-                    <h5 class="fw-bold mb-1 text-uppercase">{{ ucfirst($booking->status) }}</h5>
+                    <h5 class="fw-bold mb-1 text-uppercase" style="color: {{ $booking->status == 'pending' ? '#856404' : ($booking->status == 'confirmed' ? '#0c5460' : ($booking->status == 'paid' ? '#155724' : '#721c24')) }}">{{ ucfirst($booking->status) }}</h5>
                     <p class="mb-0 small opacity-75">
                         @if($booking->status == 'pending') Please complete payment to secure your slot.
                         @elseif($booking->status == 'confirmed') Payment proof uploaded. Waiting for admin verification.
@@ -102,9 +41,11 @@
             <div class="card-body p-4">
                 <h5 class="fw-bold mb-4">Adventure Details</h5>
                 
-                <div class="trip-mini-card">
-                    <img src="{{ $booking->trip->mountain->image ? asset('storage/'.$booking->trip->mountain->image) : 'https://via.placeholder.com/150' }}" 
-                         class="trip-mini-img shadow-sm" alt="Mountain">
+                <div style="display: flex; gap: 20px; align-items: center; background: #f8f9fa; padding: 20px; border-radius: 15px; margin-bottom: 30px;">
+                    
+                    <img src="{{ $booking->trip->mountain->image ? (Str::startsWith($booking->trip->mountain->image, 'http') ? $booking->trip->mountain->image : asset('storage/'.$booking->trip->mountain->image)) : 'https://via.placeholder.com/150' }}" 
+                         alt="Mountain"
+                         style="width: 100px; height: 100px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);">
                     <div>
                         <h4 class="fw-bold mb-1">{{ $booking->trip->title }}</h4>
                         <p class="text-muted mb-2"><i class="fas fa-mountain me-1"></i> {{ $booking->trip->mountain->name }}</p>
@@ -152,7 +93,7 @@
                     </div>
                 </div>
 
-                <div class="price-box">
+                <div style="background: white; border: 1px solid #eee; border-radius: 15px; padding: 25px;">
                     <div class="d-flex justify-content-between mb-2">
                         <span>Price per Person</span>
                         <span>{{ $booking->trip->formatted_price }}</span>
@@ -163,7 +104,7 @@
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="fw-bold text-dark">Total Amount</span>
-                        <span class="total-price text-success">{{ $booking->formatted_total_price }}</span>
+                        <span class="fw-bold text-success fs-4">{{ $booking->formatted_total_price }}</span>
                     </div>
                 </div>
 
@@ -181,11 +122,11 @@
     <div class="col-lg-4">
         
         @if($booking->status == 'pending' || $booking->status == 'confirmed')
-        <div class="action-card">
-            <div class="action-header bg-success text-white rounded-top">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="p-3 bg-success text-white rounded-top fw-bold">
                 <i class="fas fa-file-invoice-dollar me-2"></i> Payment Action
             </div>
-            <div class="p-4">
+            <div class="p-4 bg-white rounded-bottom">
                 @if($booking->status == 'pending')
                     <p class="small text-muted mb-3">Please transfer the total amount and upload your proof of payment below.</p>
                 @else
@@ -206,11 +147,11 @@
         @endif
 
         @if($booking->status == 'pending')
-        <div class="action-card">
-            <div class="action-header">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="p-3 border-bottom fw-bold text-dark">
                 <i class="fas fa-university me-2"></i> Bank Transfer
             </div>
-            <div class="p-4">
+            <div class="p-4 bg-white rounded-bottom">
                 <div class="mb-3">
                     <small class="text-muted d-block">Bank BCA</small>
                     <div class="d-flex justify-content-between align-items-center">
@@ -233,16 +174,17 @@
         @endif
 
         @if($booking->payment_proof)
-        <div class="action-card">
-            <div class="action-header">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="p-3 border-bottom fw-bold text-dark">
                 <i class="fas fa-image me-2"></i> Uploaded Proof
             </div>
-            <div class="p-3">
-                <img src="{{ asset('storage/'.$booking->payment_proof) }}" 
+            <div class="p-3 text-center bg-white rounded-bottom">
+                
+                <img src="{{ Str::startsWith($booking->payment_proof, 'http') ? $booking->payment_proof : asset('storage/'.$booking->payment_proof) }}" 
                      class="img-fluid rounded border" 
                      alt="Proof"
                      onclick="window.open(this.src)"
-                     style="cursor: pointer;">
+                     style="cursor: pointer; max-height: 300px; object-fit: contain;">
                 <div class="text-center mt-2">
                     <small class="text-muted">Click image to enlarge</small>
                 </div>
@@ -252,8 +194,8 @@
 
         @if($booking->status == 'paid')
             @if(!$booking->trip->reviews->where('user_id', auth()->id())->count())
-            <div class="action-card">
-                <div class="p-4 text-center">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="p-4 text-center bg-white rounded">
                     <h6 class="fw-bold mb-2">How was your trip?</h6>
                     <p class="small text-muted mb-3">Share your experience with other hikers.</p>
                     <a href="{{ route('user.reviews.create', $booking->trip) }}" class="btn btn-warning w-100 rounded-pill text-dark fw-bold">

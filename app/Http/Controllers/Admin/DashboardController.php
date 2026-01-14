@@ -33,7 +33,7 @@ class DashboardController extends Controller
         $monthlyRevenue = Payment::where('status', 'success')
             ->whereYear('created_at', Carbon::now()->year)
             // PERBAIKAN: Pakai CAST(... AS INTEGER) agar hasilnya angka bulat (1, 2, 3), bukan desimal (1.0)
-            ->selectRaw('CAST(EXTRACT(MONTH FROM created_at) AS INTEGER) as month, SUM(amount) as total')
+           ->selectRaw('MONTH(created_at) as month, SUM(amount) as total')
             ->groupBy('month')
             ->pluck('total', 'month')
             ->toArray();
